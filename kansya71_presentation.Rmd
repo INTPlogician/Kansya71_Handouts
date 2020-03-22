@@ -1,0 +1,182 @@
+---
+title: "「J-POP」のトレンド1960-2019"
+subtitle: "-構造的トピックモデルによる推定-"
+author: "小牧和哉(大阪大学 人間科学研究科M1)"
+date: "`r Sys.Date()`_第71回関西社会学会＠龍谷大学"
+output: 
+ revealjs::revealjs_presentation:
+　reveal_plugins: ["notes", "search","zoom"]
+　reveal_options:
+  controls: true
+  self_contained: false
+  progress: true
+  incremental: true
+  slideNumber: true
+  previewLinks: true
+  history: false
+  overview: true
+  center: false
+  left: true
+  mouseWheel: false
+  fig_width: 7
+  fig_height: 7
+  fig_caption: true
+  font_adjustment: -1
+  footer: "Copyright (c) 2015, @kohske"
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(DiagrammeR)
+```
+
+## 資料
+
+- A4サイズのレジュメ×1
+
+- GitHubにもあげています。
+
+> https://github.com/Komacky/Kansya71_Handouts
+
+# はじめに
+
+<br>
+
+<pre>本報告で言う「J-POP」とは,「日本人の「社会の心」として根付いてきたような幅広い音楽」のことを指します。</pre>
+
+## 本報告の目的　　
+
+<br>
+
+
+1960~2019の歌詞のテキスト・データを用いて, J-POPの**トピック**変遷を, **構造的トピックモデル**により推定する。
+
+  
+
+
+## J-POPの社会意識論的先行研究　　
+<br>
+
+- 見田（1978）の『近代日本の心情の歴史』
+   + １８６８年～１９６３年の歌詞のモチーフ分析
+   + 「怒り」「未練」などの感情を**事前に**構成し, 単純集計。 
+　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　     
+     
+     
+- 後続研究として, 
+  + 久保(1995)のニューミュージックのモチーフ分析（1965~1989) 
+  + 大出・松本・金子(2013)のレコード大賞作品の計量テキスト分析(1978~2012)
+  + などなど。  　　　　
+
+
+⇒ しかし, いずれも方法論的問題点が幾つかあり, 妥当性に欠ける（次スライド後述）。
+
+## 先行研究に共通する方法論的問題点
+
+
+## トピックモデルとは
+
+- 文書中の単語を確率的に推定する教師なし学習モデル。
+
+- LDA(Latent Dirichlet Allocation; Blei, D. M., et al.,2003)が代表格。
+
+- 
+
+
+
+## 解決策の一つとしての構造的トピックモデル(Structural Topic Model; Roberts, M. E., Stewart, B. M. & Tingley, S. D. ,2019)
+
+
+- CTM(Correlated Topic Model; Blei, D. M. & Lafferty, J, D., 2005)の拡張版（トピック間に相関を仮定）。
+
+- パラメーター分布にロジスティック正規分布を仮定し, トピック間相関と共変量（covariates）を回帰モデルに投入することが可能。
+
+
+ 
+図1　構造的トピックモデルのグラフィカル表現(Roberts, M. E.,Stewart. B. M. & Airoldi, E. M., 2016)
+
+- 文書中に含まれるトピック割合（θ）とトピック割合における単語割合（β）を基に文書中の単語を生成。
+
+# 方法
+
+## 分析用データ
+
+- 歌詞テキストデータ(n; 文書数=3000)　　 　
+    + 『オリコン・ランキング』(1968~2007)の各年上位50曲
+    + 『ミュージック・ライフ』(1960~67)の各年上位50曲(50曲に満たない場合は『全音歌謡曲全集』からランダムサンプリング)
+    + 『Billboard JAPAN Hot100』(2008~2019)の各年上位50曲<br>
+
+
+- 洋楽（英語のみで書かれた歌詞）は分析対象外
+
+## 分析手続き(１)
+
+- 歌詞収集に「Lyrics Master(ver.2.5.3)」を使用。
+  + 参照サイトは主に「歌ネット」「うたまっぷ」
+<br>
+- 分析にはR(ver.3.6.1)を使用し, パッケージとして**`stm()`**を使用。
+  + 前処理には**`Rmecab`**(ver.1.4), **`quanteda`**(ver.1.5.1)を使用。
+  + 使用コマンド詳細は配付資料参照。
+<br>
+
+- 総単語数
+　　+前処理前: →前処理後:
+    
+
+## 分析手続き(２)
+
+
+
+- 共変量(prevalance; 文書中のトピック割合の説明変数)　　
+    + 年(1960~2019, B-spline曲線仮定)
+    + 歌手性別(0~1,ref:女)
+    + 歌詞の古さ(2019年と発売年の差)
+    + 歌詞の長さ（総単語数)<br>　　
+　 
+　　　 
+- 共変量(content; トピック中の単語割合の説明変数) 　　
+     + 作詞者性別(同上)<br>　
+　 
+　　　 
+- 推定値算出方法: 半崩壊型変分EMアルゴリズム（最大iteration=75）　　
+    + 初期値算出方法: スペクトラル法
+    
+
+
+
+
+
+# 結果
+
+
+## トピック数選定
+
+## 全歌詞中のトピック割合（１）
+
+## 全歌詞中のトピック割合（２）
+
+
+## トピック中の歌詞例
+
+
+## トピック間相関
+
+
+## トピックのトレンド1960-2019
+
+
+# 考察
+
+
+
+# 緒言
+
+
+
+
+## Slide with 
+
+```{r, echo=FALSE}
+plot(cars)
+```
+
