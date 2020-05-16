@@ -7,7 +7,7 @@
 
 レジュメ→「_site」→「resume.pdf」
 
-当日使用したR markdownスライド→    ※ 「?print-pdf」をhtmlの後に付けるとpdf化できます(ただし, ページ番号はなし)。
+当日使用したR markdownスライド→ 「_site」→「kansya71_presentation.html 」  ※ 「?print-pdf」をhtmlの後に付けるとpdf化できます(ただし, ページ番号はなし)。
 
 分析に使用したR コマンド→「command.R」
 
