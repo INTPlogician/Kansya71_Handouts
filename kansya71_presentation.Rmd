@@ -1,182 +1,606 @@
 ---
-title: "「J-POP」のトレンド1960-2019"
-subtitle: "-構造的トピックモデルによる推定-"
-author: "小牧和哉(大阪大学 人間科学研究科M1)"
-date: "`r Sys.Date()`_第71回関西社会学会＠龍谷大学"
+title: <span style="font-size:51pt">「J-POP」のトレンド1960-2019</span>
+subtitle: <span style="font-size:40pt">---構造的トピックモデルによる推定---</span><br><br>
+author: <span style="font-size:35pt">小牧和哉(大阪大学 人間科学研究科M1)</span>
+date: "`r Sys.Date()` 第71回関西社会学会＠龍谷大学"
 output: 
- revealjs::revealjs_presentation:
-　reveal_plugins: ["notes", "search","zoom"]
-　reveal_options:
-  controls: true
-  self_contained: false
-  progress: true
-  incremental: true
-  slideNumber: true
-  previewLinks: true
-  history: false
-  overview: true
-  center: false
-  left: true
-  mouseWheel: false
-  fig_width: 7
-  fig_height: 7
-  fig_caption: true
-  font_adjustment: -1
-  footer: "Copyright (c) 2015, @kohske"
+  revealjs::revealjs_presentation: 
+   reveal_plugins: ["notes","zoom"]
+   css: white2.css
+   self_contained: false 
+pandoc_args: ['--from', 'markdown+autolink_bare_uris+tex_math_single_backslash-implicit_figures']
+slideNumber: true
+smaller: true
+center: false
+left: true
+progress: true
+incremental: true
+history: false
+overview: true
+mathjax: local
+　 reveal_options: 
+    previewLinks: true
+ 
+    
+   
 ---
 
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+```{r,include=F}
+knitr::opts_chunk$set(
+	echo = F,
+	message = FALSE,
+	eval=T,
+	include=T,
+	error = F,
+	warning = FALSE,
+	dependson= T,
+	prompt=T,
+	fig.width = 7,
+	fig.height=4,
+	fig.align="center",
+	dpi=120
+	
+	
+)
+
+load(".RData")
 library(DiagrammeR)
+library(knitr)
+library(rmdformats)
+library(RMeCab)
+library(dplyr)
+library(stringr)
+library(stringi)
+library(ggplot2)
+library(magrittr)
+library(stm)
+library(devtools)
+library(usethis)
+library(readxl)
+library(readtext)
+library(tidyr)
+library(tm)
+library(tibble)
+library(tidytext)
+library(tidyverse)
+library(ggthemes)
+library(furrr)
+library(scales)
+library(corrplot)
+library(grDevices)
+library(RColorBrewer)
+
 ```
+
 
 ## 資料
 
-- A4サイズのレジュメ×1
+- A4サイズのレジュメ
 
-- GitHubにもあげています。
+- GitHubにRコマンド, 発表資料, レジュメ, 予稿をあげています。
 
-> https://github.com/Komacky/Kansya71_Handouts
+[https://github.com/Komacky/Kansya71_Handouts](https://github.com/Komacky/Kansya71_Handouts)
+
+
+- 発表中途で出てくるグラフの細かい数値等は, レジュメを参照して下さい。
 
 # はじめに
 
-<br>
 
-<pre>本報告で言う「J-POP」とは,「日本人の「社会の心」として根付いてきたような幅広い音楽」のことを指します。</pre>
+## 本報告の目的　
 
-## 本報告の目的　　
-
-<br>
+- 1960~2019の歌詞のテキストデータを用いて, 「J-POP」の**トピック**変遷を, **構造的トピックモデル**により推定する。
 
 
-1960~2019の歌詞のテキスト・データを用いて, J-POPの**トピック**変遷を, **構造的トピックモデル**により推定する。
-
-  
+- 本報告で言う「J-POP」とは,「日本人の「社会の心」として根付いてきたような幅広い音楽」のことを指す。
 
 
 ## J-POPの社会意識論的先行研究　　
 <br>
 
 - 見田（1978）の『近代日本の心情の歴史』
-   + １８６８年～１９６３年の歌詞のモチーフ分析
+   + 1868年～1963年の歌詞のモチーフ分析
    + 「怒り」「未練」などの感情を**事前に**構成し, 単純集計。 
 　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　　     
      
-     
 - 後続研究として, 
-  + 久保(1995)のニューミュージックのモチーフ分析（1965~1989) 
-  + 大出・松本・金子(2013)のレコード大賞作品の計量テキスト分析(1978~2012)
-  + などなど。  　　　　
+  + 久保（1995）のニューミュージックのモチーフ分析（1965~1989）
+  + 大出・松本・金子（2013）のレコード大賞作品の計量テキスト分析（1978~2012）
+  + などなど。  
+  
+⇒しかし, これらの先行研究も含め歌詞分析においては, （1）社会学的・（2）方法論的問題がはらんでいることを踏まえておく必要がある。
+
+## （１）社会学的問題: 歌詞分析の困難性
+
+- 見田（1978）以後の「歌詞＝時代の鏡」という図式の崩壊
+  + 理由としては, 視覚メディアの台頭（小川, 1997）, 70sのアメリカン・ポップスの流入（増田, 2006: 98-100）等。<br>
+　
+- 「不可分性の公理」（北田, 2004: 155-183）
+  + 「歌詞のみでは（音楽は）語れない」という**公理の自明化**⇒「歌詞」分析眼の欠落
+　+ 更に公理の実践によるライナーノーツ的な**語りの特権化**⇔語りえないメロデイの良さ<br>
+
+⇒結果的に, 多くが理論的・歴史的な言及に留まったまま。また, 歌詞分析批判の反面, **計量的に把握はあまり試みられていない。**
 
 
-⇒ しかし, いずれも方法論的問題点が幾つかあり, 妥当性に欠ける（次スライド後述）。
+## （２）方法論的問題: 計量の仕方
 
-## 先行研究に共通する方法論的問題点
+- 単語の定義の恣意性
+  + アドホックな単語の定義の拡大によるp-hackingの可能性
+     + また, データが増えるに連れて, コーディングが煩雑に。
+<br>
+- トピック(モチーフ)の意味論的考慮
+  + 同一文書中に共起する語との関連性(文脈)でトピックがラベリングされていない
+  + 同一単語に対しても同様
+
+- データの代表性
+  + 紅白歌合戦の受賞曲等の質的指標への傾倒
+
+- 外生変数の考慮
+  + 計量的とは言い難く, 相関レベルでも擬似の可能性
+  + クロス集計は可能だが, やはり単語を恣意的に選択する可能性
+  
+⇒本発表では, （2）方法論的問題の解決案として**構造的トピックモデル**という分析枠組みを通じて, （1）社会学的問題に答えたい。
+
+## 補足: トピックモデル(LDA)とは
+
+- 文書や単語にトピックを仮定し, その事後分布を確率的に推定する階層ベイズモデル。
+  + **一文書につき, 複数トピックが確率的に分布すると仮定(⇔クラスタリング)。**
+  + 単語の順序性は無視(BoW:Bag of Words), 単語集合(コーパス)を作成。
+  + **単語のコーディングは事前に行わない（ただし, トピック数は仮定）。**
+<br></br>
+- LDA(Latent Dirichlet Allocation;Blei et al. 2003)が代表格。
+  + 文書中に含まれるトピック割合($\theta$)とトピック割合における単語割合($\beta$)を基に, 文書中の単語を生成。
+  + パラメータ分布($\theta$)にディリクレ分布($\alpha,\beta$)を仮定。
+  + MCMC(ギブスサンプラー等)や変分ベイズ法により推定。
+
+- ただし, **(1)トピック同士無相関の仮定があり, (2)Dir($\theta|\alpha,\beta$)の 教師なし学習モデル。また, (3)時系列モデリングに対応していない。**⇒現実的でない
 
 
-## トピックモデルとは
 
-- 文書中の単語を確率的に推定する教師なし学習モデル。
-
-- LDA(Latent Dirichlet Allocation; Blei, D. M., et al.,2003)が代表格。
-
-- 
+## 分析モデル: 構造的トピックモデル(Structural Topic Model; Roberts et al. 2019)
 
 
+- LDAの拡張版(LDAに文脈情報を付加)。
+  + 手動コーディングと94%程度一致（Roberts et al. 2014）。
+  + **時系列分析が可能。**
 
-## 解決策の一つとしての構造的トピックモデル(Structural Topic Model; Roberts, M. E., Stewart, B. M. & Tingley, S. D. ,2019)
+- 潜在パラメーター($\theta,\beta$)にロジスティック正規分布($logit(p)$が確率変数）と多項ロジット分布を仮定し, **共変量(covariates)を回帰モデル(GLM)に投入可能。⇒現実的**
+
+- 事後分布(詳細はRobers et al.2016,2019)<span style="font-size:15pt">$p(\theta,z,k,\gamma,\Sigma|w,X,Y)=\\\left( \prod_{d=1}^DLogisticNormal(\theta_d|\mu=X_d\gamma,\Sigma)\left(\prod_{n=1}^NMultinormal(z_{n,d}|\theta_d)\\×Multinormal(w_n|\beta_{d,k=z_{d,n}}\right)\right)\prod p(k)×\prod Normal(\gamma_k|\sigma^2_k)×\prod Gamma(\sigma^2_k|r^\gamma)$</span>
+- <span style="font-size:15pt">$d$:文書,$n$:単語,$k$:トピック,$w$:単語集合,$\theta_d$:文書中のトピック分布,$\mu=X_d\gamma,\Sigma$:文書-トピック行列と分散・共分散行列,$z_{n,d}$:各文書中の各単語における潜在変数(トピック),$\beta_{d,k=z_{d,n}}$:トピックに割り当てられる単語分布,$\Gamma$:過剰適合を防ぐ事前分布</span>
 
 
-- CTM(Correlated Topic Model; Blei, D. M. & Lafferty, J, D., 2005)の拡張版（トピック間に相関を仮定）。
 
-- パラメーター分布にロジスティック正規分布を仮定し, トピック間相関と共変量（covariates）を回帰モデルに投入することが可能。
+## 図: 構造的トピックモデルのグラフィカル・モデル(Roberts et al. 2016)
 
+<img src= "C:/Users/komaki kazuya/Desktop/R/Kansya71_Handouts/model.png" >
 
- 
-図1　構造的トピックモデルのグラフィカル表現(Roberts, M. E.,Stewart. B. M. & Airoldi, E. M., 2016)
-
-- 文書中に含まれるトピック割合（θ）とトピック割合における単語割合（β）を基に文書中の単語を生成。
 
 # 方法
 
 ## 分析用データ
 
-- 歌詞テキストデータ(n; 文書数=3000)　　 　
+- 歌詞テキストデータ(n:文書数=2934)　※元文書数n=3000 　
     + 『オリコン・ランキング』(1968~2007)の各年上位50曲
-    + 『ミュージック・ライフ』(1960~67)の各年上位50曲(50曲に満たない場合は『全音歌謡曲全集』からランダムサンプリング)
-    + 『Billboard JAPAN Hot100』(2008~2019)の各年上位50曲<br>
+    + 『ミュージック・ライフ』(1960~67)の各年上位50曲(50曲に満たない場合は『全音歌謡曲全集』から乱数によりランダムサンプリング)
+    + 『Billboard JAPAN Hot100』(2008~2019)の各年上位50曲
+<br></br>
+
+- 洋楽（英語のみの歌詞）は分析対象外
 
 
-- 洋楽（英語のみで書かれた歌詞）は分析対象外
-
-## 分析手続き(１)
+## 分析手続き
 
 - 歌詞収集に「Lyrics Master(ver.2.5.3)」を使用。
   + 参照サイトは主に「歌ネット」「うたまっぷ」
-<br>
-- 分析にはR(ver.3.6.1)を使用し, パッケージとして**`stm()`**を使用。
+  <br></br>
+- 分析には**`R`**(ver.3.6.1)を使用し, パッケージとして**`stm()`**を使用。
   + 前処理には**`Rmecab`**(ver.1.4), **`quanteda`**(ver.1.5.1)を使用。
-  + 使用コマンド詳細は配付資料参照。
-<br>
-
+  + 使用コマンド詳細はGithub参照。
+<br></br>
 - 総単語数
-　　+前処理前: →前処理後:
+  + 前処理前:16363 →前処理後:589
+<br></br>
+- 作詞者性別が不明のものは欠損値として扱った。
     
 
-## 分析手続き(２)
+## 変数一覧
 
 
 
-- 共変量(prevalance; 文書中のトピック割合の説明変数)　　
-    + 年(1960~2019, B-spline曲線仮定)
-    + 歌手性別(0~1,ref:女)
+- 共変量(**`prevalance`**; 文書中のトピック割合の説明変数)　　
+    + 年(1960~2019, B-spline曲線仮定`bs()`)
+    + 年(15年区分のダミー変数)
+    + 歌手性別(男,女,男女)
+    + 作詞者性別(同上)
     + 歌詞の古さ(2019年と発売年の差)
-    + 歌詞の長さ（総単語数)<br>　　
-　 
-　　　 
-- 共変量(content; トピック中の単語割合の説明変数) 　　
-     + 作詞者性別(同上)<br>　
-　 
-　　　 
-- 推定値算出方法: 半崩壊型変分EMアルゴリズム（最大iteration=75）　　
-    + 初期値算出方法: スペクトラル法
+    + 歌詞の長さ(総単語数)<br>　　
+　
+
+## 推定手法　 
+
+- 半崩壊型変分EMアルゴリズム
+  + 周辺尤度をEMアルゴリズム(最尤法)により最大化し, パラメータ事後分布を導出
+  + 初期値: スペクトラル法
+<br></br>
+
+<!--
+- 単語分布の推定値: SAGE(Sparse additive Generative Model;Einsentain et al. 2011)
+$$\beta_{d,k} \propto \exp(m+k_k+k{g_d}+k_{i=(k,g_d)})$$
+ + $m$:単語分布
+ + $k$:トピック固有の偏差
+ + $k{g_d}$:共変量の偏差
+ + $k_{i=(k,g_d)}$:前者二項の交互作用
+ + 単語の出現確率をdeviation(偏差)で表現。
+ -->
     
-
-
 
 
 
 # 結果
 
 
-## トピック数選定
+## トピック数選定（１）
 
-## 全歌詞中のトピック割合（１）
+```{r, fig.height=4.5,fig.width=10,fig.fullwidth=T ,fig.margin=T}
 
-## 全歌詞中のトピック割合（２）
+kResult[["results"]] %>% select(K, exclus, semcoh, heldout, residual) %>%  
+  unnest() %>%
+  gather(Metric, Value, -K) %>%
+   ggplot(aes(K, Value, colour = Metric)) +
+  geom_point(size=2, shape=22, colour="grey", fill="lightgreen")+
+    geom_line(size = 1.5, alpha = 0.7, show.legend = F) +
+     
+      facet_wrap(~ Metric, scales = "free_y") +
+       theme(plot.title = element_text(hjust = 0.5,size = 20))+
+        labs(x = "K (number of topics)", y = "Value", title = "Fig.2 トピック数（K）別の各指標の推定値")
 
 
-## トピック中の歌詞例
+
+```
+
+- semantic coherence...意味論的なまとまり
+- exclusivity...トピックの排他性
+- residual...残差
+- heldout...クロスバリデーションに基づく尤度
+
+
+
+## トピック数選定（２）
+
+```{r}
+
+
+
+kResult$results %>%
+  select(K, exclus, semcoh) %>%
+  filter(K %in% 2:10) %>%
+  unnest() %>%
+  mutate(K = as.factor(K)) %>%
+  ggplot(aes(semcoh, exclus,color=K))+
+  geom_point(size = 2, alpha = 1) +
+  scale_colour_identity(guide="legend")+
+  theme(plot.title = element_text(hjust = 0.5,size = 20),
+        axis.text.x = element_text(size=10),
+        axis.text.y = element_text(size=10),
+        legend.position="right")+
+  labs(x = "Semantic coherence", y = "Exclusivity",
+       title = "Semantic coherenceとExclusivityの比較")
+
+
+```
+
+## トピック数選定（３）
+
+```{r}
+
+modelc %>% 
+  ggplot(aes(semanticCoherence, exclusivity,color=model))+
+    geom_point(size = 2, alpha = 1) +
+    scale_color_hue(name = "model", labels = c("1" = "K=5", "2" ="K=6", "3"="K=7" ) )+
+    theme(plot.title = element_text(hjust = 0.5,size = 20),
+          axis.text.x = element_text(size=10),
+          axis.text.y = element_text(size=10),
+          legend.position="right")+
+  labs(x = "Semantic coherence", y = "Exclusivity",
+        title = "モデル間のSemantic CoherenceとExclusivityの比較")
+
+```
+
+- K=5,7あたりが妥当。それぞれで推定を行った結果, 解釈可能なK=7をトピック数として定め, 分析を行った。
+
+
+## 文書中のトピック割合
+
+```{r}
+
+gamma_terms_7 %>%
+   top_n(10, gamma) %>%
+   ggplot(aes(topic, gamma, label = terms, fill = topic)) +
+   geom_col(alpha = 0.8,show.legend = FALSE) +
+   geom_text(hjust = 0, nudge_y = 0.0005, size = 4.5) +
+    coord_flip() +
+    scale_y_continuous(expand = c(0,0), limits = c(0, 0.5), labels = percent_format()) +
+   theme_tufte(ticks = FALSE) +
+    theme(plot.title = element_text(hjust = 0.5,size = 20),
+                 plot.subtitle = element_text(size = 13),
+                    axis.text.x = element_text(size=10),
+                   axis.text.y = element_text(size=12))+
+     labs(x = NULL, y = expression("θ: Mean P（Topic|document）"),
+                 title = "文書中のトピック割合")
+
+
+
+
+```
+
+
+## トピックごとの単語割合（β）
+
+
+```{r,fig.height=5}
+
+topic7_th  %>%
+  group_by(topic) %>%
+  top_n(10, beta) %>%
+  ungroup() %>%
+  mutate(topic = paste0("Topic ", topic),
+         term = reorder_within(term, beta, topic)) %>%
+  ggplot(aes(term, beta, fill = as.factor(topic))) +
+  geom_col(alpha = 0.8, show.legend = FALSE) +
+  facet_wrap(~ topic, scales = "free_y") +
+  coord_flip() +
+  scale_x_reordered() +
+  ggtitle("トピックごとの単語割合（上位10語）") +
+  theme(plot.title = element_text(hjust = 0.5,size=20),
+        axis.text.y = element_text(size=8)) +
+  labs(x="", y = expression("（β: P(word|topic)）"))
+
+
+```
+
+
+
+
+## トピック中の歌詞例: トピック１
+
+```{r}
+
+plotQuote(thoughts7_1, width=100, main="Topic 1")
+
+
+```
+
+- 「男」「女」というカテゴリーで語られる「恋」を綴る歌詞
+- ⇒**P to P :Person（男性 or 女性） \rightleftarrows（to）Person（男性 or 女性）**
+
+
+
+
+
+
+
+
+## トピック中の歌詞例: トピック２
+
+```{r}
+
+plotQuote(thoughts7_2, width=100, main="Topic 2")
+
+
+```
+
+- 女性（「わたし」）から男性（「あなた」）への気持ち（「恋」「愛」）を表現する歌詞<br>
+⇒**F to M: Female to Male**
+
+
+
+## トピック中の歌詞例: トピック３
+
+```{r}
+
+
+plotQuote(thoughts7_3, width=100, main="Topic 3")
+
+
+```
+
+- 未来志向で, 他者と共に困難を乗り越えていくことを謳った歌詞が多く見られる<br>**P to F with P: Person （男性 or 女性）to Future with People（みんな）**
+
+
+
+## トピック中の歌詞例: トピック４
+
+```{r}
+
+
+plotQuote(thoughts7_4, width=100, main="Topic 4")
+
+
+```
+
+- 男性（「俺」）視点で, 女性（「お前」）に気持ちを伝える歌詞 <br> ⇒**M to F: Male to Female**
+
+
+
+## トピック中の歌詞例: トピック５
+
+```{r}
+
+
+plotQuote(thoughts7_5, width=100, main="Topic 5")
+
+
+```
+
+- 自然（「夏」「星」）と重ね合わせた歌詞（比喩的）<br>⇒
+ **P to P with M: Person（男or女）to Person（男or女）with Metaphor**
+
+
+
+
+
+## トピック中の歌詞例: トピック６
+
+```{r}
+
+
+plotQuote(thoughts7_6, width=100, main="Topic 6")
+
+
+```
+
+- 男性（「僕」）から女性（「君」）へと気持ちを伝える歌詞<br>⇒**M to F: Male to Female**
+
+
+
+## トピック中の歌詞例: トピック７
+
+```{r}
+
+
+plotQuote(thoughts7_7, width=100, main="Topic 7")
+
+
+```
+
+- 恋愛の未練・悲しさを謳った歌詞<br>⇒**P to Past with P: Person（男or女） to past with Person（男or女）**
 
 
 ## トピック間相関
 
+```{r}
 
-## トピックのトレンド1960-2019
+corrplot(M, method = "color", col = col(200),
+         type = "upper", order = "hclust", number.cex = .7,
+         addCoef.col = "black", # Add coefficient of correlation
+         tl.col = "black", tl.srt = 90, # Text label color and rotation
+         
+         # hide correlation coefficient on the principal diagonal
+         diag = F)
+
+
+```
+
+- トピック2（F to M）と6（M to F）は中程度の逆相関。
+- トピック1（P to P）とトピック3（P to F with P）が中程度の逆相関。
+
+
+## トピックのトレンド１９６０～２０１９
+
+```{r,fig.height=6,fig.width=10,fig.fullwidth=T ,fig.margin=T}
+
+par(mfrow = c(3, 3))
+
+for (i in 1:7){
+  plot(kaiki7.spline, "年代", method = "continuous", topics = c(i) 
+       ,main =  c(str_c("Topic ", i,":"),paste(labels7$prob[i,1:7],collapse = ", ")),xlab="Year" ,ylab=expression("Expected Topic Propoton（θ）")
+       ,printlegend=F )
+
+}
+
+mtext(side = 1, line= -2, outer=T, text = "Fig. J-POPのトレンド1960-2019", cex=2 )
+
+```
+ 
+---
+ 
+ 
+
+- 1960年頃と比べて, トピック1（P to P), 2（F to M）, 4（M to F）は減少傾向。
+- トピック3（P to F with P）,5（P to P with M）は増加。6と7はあまり変動なし。
+
+
+# 追加分析
+
+## 共変量ごとのトレンド推定: 歌手性別
+
+```{r,fig.height=5,fig.width=8}
+
+
+
+par(mfrow = c(3,3))
+
+for (i in 1:7){
+  
+plot(prep2, covariate="年代", model=poliblogInteraction, method="continuous", xlab="Year",ylab="Expected Topic Propotion（θ）",main =  c(str_c("Topic ", i,":"),paste(labels7$prob[i,1:7],collapse = ", ")),
+     moderator="歌手性別", moderator.value="男", linecol="blue", ylim=c(0,0.50), topics=c(i),
+     printlegend=F)
+plot(prep2, covariate="年代", model=poliblogInteraction, method="continuous", xlab="Year",ylab="Expected Topic Propotion（θ）",main =  c(str_c("Topic ", i,":"),paste(labels7$prob[i,1:7],collapse = ", ")),
+     moderator="歌手性別", moderator.value="女", linecol="red", add=T,topics=c(i),
+     printlegend=F)
+legend("topleft", c("男", "女"), lwd=2, col=c("blue", "red"))
+
+}
+
+
+```
+
+## 共変量ごとのトレンド推定: 作詞者性別
+
+```{r,fig.height=5,fig.width=8}
+
+
+
+
+par(mfrow = c(3, 3))
+
+for (i in 1:7){
+  
+plot(prep3, covariate="年代", model=poliblogInteraction2, method="continuous", xlab="Year",ylab="Expected Topic Propotion（θ）",main =  c(str_c("Topic ", i,":"),paste(labels7$prob[i,1:7],collapse = ", ")),
+     moderator="sex_w", moderator.value="男", linecol="blue", ylim=c(0,0.50), topics=c(i),
+     printlegend=F)
+plot(prep3, covariate="年代", model=poliblogInteraction2, method="continuous", xlab="Year",ylab="Expected Topic Propotion（θ）",main =  c(str_c("Topic ", i,":"),paste(labels7$prob[i,1:7],collapse = ", ")),
+     moderator="sex_w", moderator.value="女", linecol= "red", add=T,topics=c(i),
+     printlegend=F)
+legend("topleft", c("男", "女"), lwd=2, col=c("blue", "red"))
+
+}
+
+
+```
 
 
 # 考察
 
+---
+
+- 分析の結果より, トピックは7つ程度に分類された。
+- トピック1,2,4の減少は, 歌謡曲がニューミュージック等のポップスに移行した知見と符合する。また, これらは「愛」「恋」を頻出語として含むトピックで,トピック1に関しては, 3（P to F with P）と負の相関となっていることから, それが「（今を軸とした）未来」に向かって相対化されていることが考えられる。また, 人称も固定化されなくなっている。
+⇒ 「《繋がり》の社会性の上昇」と「内面なき実存」（北田, 2005:206,227）の共棲？
+  + ただし, トピック6のような男性目線の歌詞は全年代を通じて一定割合を占めている（非対称性）。またトピック3においても「僕ら」「自分」が頻出語となっていることから, やはり男性目線の歌詞が多い。これは歌手性別の影響を統制しても見られた。<br></br>
+- 1980年代頃からの自己表現が高まったことは, 烏賀陽（2005: 132-144） カラオケ（1985年に誕生）やバンドブームの隆盛と内生的には連関の可能性があり。
 
 
-# 緒言
+
+# 緒言: 方法論的な視点から
+
+---
+
+- （特に）歌詞分析は, 実証的にあまりされてこなかったが, 背景には,  メロディにまつわる社会学的な問題があることを踏まえておく必要が有る。<br></br>
+- 構造的トピックモデル（STM）は, コーディングにまつわる問題点を解決してくれる可能性。<br></br>
+- ただし, 当然解釈するのは「人」なので, 分析モデルにおいて, 経験的に妥当なものを選択することが必要。<br></br>
+- その為に, 前処理・エラボレーションには時間をかける（**ゴミを入れたらゴミが出る**）。
 
 
+# 今後の課題: 方法論的な視点から
 
+---
 
-## Slide with 
-
-```{r, echo=FALSE}
-plot(cars)
-```
+- 処理方法への依存性
+  + 特に日本語
+  + Twitter等の短文書や過分散の文書はトリミングに左右されるので注意。
+<br></br>
+- 新規トピックの生成・消滅の表現
+  + 時点間における**トピック数**そのものの変化をどうやって示すか。
+<br></br>
+- データの代表性
+  + セレクションバイアスの回避
+<br></br>
+- トピック数選定のプロセスの明確化・エラボレーション
+  + 先行研究では結構曖昧
+<br></br>
+- トピックのチェリーピッキング(確証バイアス)
+  + トピック数が多すぎる場合
+  + ラベリングできないトピックを含むモデルはOK？
 
