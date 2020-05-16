@@ -5,7 +5,7 @@
 
 予稿→
 
-当日使用したR markdownスライド→
+当日使用したR markdownスライド→    ※ 「?print-pdf」をhtmlの後に付けるとpdf化できます(ただし, ページ番号はなし)。
 
 当日使用したR markdownのコマンド→
 
