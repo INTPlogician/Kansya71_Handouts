@@ -1,13 +1,15 @@
 # Kansya71_Handouts
 
 
-配付資料並びに引用文献, 分析に使用したRコマンドをUPしてあります。
+配付資料並びに引用文献, 分析に使用したRコマンドをUPしてあります。個別のファイルダウンロードはリンクをクリック後, 右上「Raw」→右クリック「名前を付けて保存」で行えます。
 
-予稿→
+予稿→「71回 一般研究報告A・「J-POP」のトレンド1960-2019 小牧和哉.pdf」
 
-当日使用したR markdownスライド→    ※ 「?print-pdf」をhtmlの後に付けるとpdf化できます(ただし, ページ番号はなし)。
+レジュメ→「_site」→「resume.pdf」
 
-当日使用したR markdownのコマンド→
+当日使用したR markdownスライド→ 「_site」→「kansya71_presentation.html 」  ※ 「?print-pdf」をhtmlの後に付けるとpdf化できます(ただし, ページ番号はなし)。
+
+分析に使用したR コマンド→「command.R」
 
 ファイルの一括ダウンロードは, 右上緑色の「clone or download」→「Download ZIP」でできます。
 
