@@ -5,6 +5,8 @@
 
 予稿→「71回 一般研究報告A・「J-POP」のトレンド1960-2019 小牧和哉.pdf」
 
+レジュメ→「_site」→「resume.pdf」
+
 当日使用したR markdownスライド→    ※ 「?print-pdf」をhtmlの後に付けるとpdf化できます(ただし, ページ番号はなし)。
 
 分析に使用したR コマンド→「command.R」
