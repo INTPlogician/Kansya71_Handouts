@@ -7,7 +7,7 @@
 
 レジュメ→「resume.pdf」
 
-当日使用したR markdownスライド→ 「J-POP」のトレンド1960-2019発表用資料.pdf 
+当日使用したR markdownスライド→ 「「J-POP」のトレンド1960-2019発表用資料.pdf 」
 
 分析に使用したR コマンド→「command.R」
 
