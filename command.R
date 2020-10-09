@@ -282,26 +282,28 @@ labels7<- labelTopics(poliblogSelect7topic, 1:7, n=10)
 
 
 
-thoughts7_1 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,1,50), n=10, topics=1)$docs[[1]]
-plotQuote(thoughts7_1, width=90, main="Topic 1")
+thoughts7_1 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,1,50), n=30, topics=1)$docs[[1]]
+plotQuote(thoughts7_1[c(1,8,10,18,21,22,23,25,27,28)], width=90, main="Topic 1")
 
-thoughts7_2 <- findThoughts(poliblogSelect7topic, texts=str_sub(meta$歌詞,50,100), n=10, topics=2)$docs[[1]]
-plotQuote(thoughts7_2, width=50, main="Topic 2")
+thoughts7_2 <- findThoughts(poliblogSelect7topic, texts=str_sub(meta$歌詞,50,100), n=30, topics=2)$docs[[1]]
+plotQuote(thoughts7_2[c(3,5,7,9,12,14,18,23,27,29)], width=50, main="Topic 2")
 
-thoughts7_3 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,50,100), n=10, topics=3)$docs[[1]]
-plotQuote(thoughts7_3, width=100, main="Topic 3")
+thoughts7_3 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,1,50), n=30, topics=3)$docs[[1]]
+plotQuote(thoughts7_3[c(9,11,12,14,15,16,17,18,23,26)], width=100, main="Topic 3")
 
-thoughts7_4 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,1,50), n=10, topics=4)$docs[[1]]
-plotQuote(thoughts7_4, width=150, main="Topic 4")
+thoughts7_4 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,1,50), n=30, topics=4)$docs[[1]]
+plotQuote(thoughts7_4[c(3,4,7,17,18,22,26,28,29,30)], width=150, main="Topic 4")
 
-thoughts7_5 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,150,200), n=10, topics=5)$docs[[1]]
-plotQuote(thoughts7_5, width=100, main="Topic 5")
+thoughts7_5 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,150,200), n=30, topics=5)$docs[[1]]
+plotQuote(thoughts7_5[c(3,4,7,8,9,11,15,20,26,28)], width=100, main="Topic 5")
 
-thoughts7_6 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,100,150), n=10, topics=6)$docs[[1]]
-plotQuote(thoughts7_6, width=100, main="Topic 6")
+thoughts7_6 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,100,150), n=30, topics=6)$docs[[1]]
+plotQuote(thoughts7_6[c(1,2,5,8,14,15,16,17,23,24)], width=100, main="Topic 6")
 
-thoughts7_7 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,100,150), n=10, topics=7)$docs[[1]]
-plotQuote(thoughts7_7, width=100, main="Topic 7")
+thoughts7_7 <- findThoughts(poliblogSelect7topic, texts=str_sub(out$meta$歌詞,100,150), n=30, topics=7)$docs[[1]]
+plotQuote(thoughts7_7[c(1,6,11,13,16,18,20,24,25,29)], width=100, main="Topic 7")
+
+
 
 
 
